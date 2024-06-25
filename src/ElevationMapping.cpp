@@ -222,7 +222,7 @@ bool ElevationMapping::readParameters()
     map_frame = declare_parameter("map_frame", "/map");
     robot_frame = track_point_frame_id_;
     map_.setFrameID(map_frame);
-    sensor_type = declare_parameter("sensor.type", "perfect");
+    sensor_type = declare_parameter("sensor.type", "realsense");
     if (sensor_type == "perfect") sensor_processor_ = std::make_shared<PerfectSensorProcessor>(sensor_frame, map_frame, robot_frame);
     else if (sensor_type == "stereo") 
     {
