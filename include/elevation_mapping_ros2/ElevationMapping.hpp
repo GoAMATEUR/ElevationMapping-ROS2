@@ -26,6 +26,7 @@
 #include <elevation_mapping_ros2/sesnor_processing/SensorProcessorBase.hpp>
 #include <elevation_mapping_ros2/sesnor_processing/PerfectSensorProcessor.hpp>
 #include <elevation_mapping_ros2/sesnor_processing/StereoSensorProcessor.hpp>
+#include <elevation_mapping_ros2/sesnor_processing/StructureLightProcessor.hpp>
 #include <elevation_mapping_ros2/TypeDef.hpp>
 #include <elevation_mapping_ros2/RobotMotionUpdater.hpp>
 

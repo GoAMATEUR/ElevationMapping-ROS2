@@ -222,18 +222,17 @@ bool ElevationMapping::readParameters()
     map_frame = declare_parameter("map_frame", "/map");
     robot_frame = track_point_frame_id_;
     map_.setFrameID(map_frame);
-    sensor_type = declare_parameter("sensor.type", "realsense");
-    if (sensor_type == "perfect") sensor_processor_ = std::make_shared<PerfectSensorProcessor>(sensor_frame, map_frame, robot_frame);
-    else if (sensor_type == "stereo") 
-    {
+    sensor_type = declare_parameter("sensor.type", "perfect");
+    if (sensor_type == "perfect") {
+        sensor_processor_ = std::make_shared<PerfectSensorProcessor>(sensor_frame, map_frame, robot_frame);
+    }
+    else if (sensor_type == "stereo") {
         sensor_processor_ = std::make_shared<StereoSensorProcessor>(sensor_frame, map_frame, robot_frame);
     }
     else if (sensor_type == "realsense") {
-        // TODO: Implement structure sensor processor
-        sensor_processor_ = std::make_shared<PerfectSensorProcessor>(sensor_frame, map_frame, robot_frame);
+        sensor_processor_ = std::make_shared<StructureLightProcessor>(sensor_frame, map_frame, robot_frame);
     }
-    else 
-    {
+    else {
         RCLCPP_ERROR(get_logger(), "The sensor type %s is invailed", sensor_type.c_str());
         return false;
     }

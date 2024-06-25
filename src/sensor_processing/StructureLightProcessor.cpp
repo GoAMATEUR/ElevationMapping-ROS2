@@ -4,10 +4,7 @@
 namespace elevation_mapping
 {
 StructureLightProcessor::StructureLightProcessor(const std::string& _sensor_frame, const std::string& _map_frame, const std::string& _robot_frame)
-    : SensorProcessorBase(_sensor_frame, _map_frame, _robot_frame)
-{
-
-}
+    : SensorProcessorBase(_sensor_frame, _map_frame, _robot_frame) {}
 
 StructureLightProcessor::~StructureLightProcessor() {}
 
