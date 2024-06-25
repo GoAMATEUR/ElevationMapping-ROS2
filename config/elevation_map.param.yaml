@@ -28,15 +28,15 @@
       scanning_duration: 0.5
       increase_height_alpha: 0.1
 
-    # sensor processing
-    # Ideal sensor for debugging
-    # sensor:
-    #   logger_name: PerfectSensorProcessor
-    #   type: "perfect"
-    #   use_voxel_filter: true
-    #   voxel_leaf_size: 0.05
-    #   pass_filter_lower_threshold: -100.0 # -infinity
-    #   pass_filter_upper_threshold: 0.4
+    ## sensor processing
+    ##Ideal sensor for debugging
+    sensor:
+      logger_name: PerfectSensorProcessor
+      type: "perfect"
+      use_voxel_filter: true
+      voxel_leaf_size: 0.05
+      pass_filter_lower_threshold: -100.0 # -infinity
+      pass_filter_upper_threshold: 0.4
 
     # sensor:
       # logger_name: StereoSensorProcessor
@@ -49,17 +49,17 @@
       # coef_lateral_variance: 0.0001
 
     # # D435I
-    sensor_processor:
-      logger_name: StructureLightProcessor
-      type: "realsense"
-      cutoff_min_depth: 0.2
-      cutoff_max_depth: 3.25
-      normal_factor_a: 0.000611
-      normal_factor_b:  0.003587
-      normal_factor_c: 0.3515
-      normal_factor_d: 0
-      normal_factor_e: 1
-      lateral_factor: 0.01576
+    # sensor:
+    #   logger_name: StructureLightProcessor
+    #   type: "realsense"
+    #   cutoff_min_depth: 0.2
+    #   cutoff_max_depth: 3.25
+    #   normal_factor_a: 0.000611
+    #   normal_factor_b:  0.003587
+    #   normal_factor_c: 0.3515
+    #   normal_factor_d: 0.0
+    #   normal_factor_e: 1.0
+    #   lateral_factor: 0.01576
 
     robot_motion_updater:
       logger_name: RobotMotionUpdater

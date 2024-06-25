@@ -17,7 +17,7 @@ class PosePublisherNode(Node):
         msg.header.frame_id = 'map'
         msg.pose.pose.position.x = 0.0
         msg.pose.pose.position.y = 0.0
-        msg.pose.pose.position.z = -0.1
+        msg.pose.pose.position.z = 0.1
         msg.pose.pose.orientation.x = 0.0
         msg.pose.pose.orientation.y = 0.0
         msg.pose.pose.orientation.z = 0.0

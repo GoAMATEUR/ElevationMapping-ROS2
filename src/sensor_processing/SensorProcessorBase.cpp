@@ -62,15 +62,17 @@ bool SensorProcessorBase::updateTransformations()
         
         // base to sensor
         transformTF = tf_buffer_->lookupTransform(kRobotFrameID_, kSensorFrameID_, current_time_point_, tf2::durationFromSec(1.0));
-        Eigen::Affine3d transform;
-        rotation_base2sensor_ = transform.rotation().matrix();
-        translation_base2sensor_ = transform.translation();
+        Eigen::Affine3d transform_affine;
+        transform_affine = tf2::transformToEigen(transformTF);
+        rotation_base2sensor_ = transform_affine.rotation().matrix();
+        translation_base2sensor_ = transform_affine.translation();
 
         // map to base
         transformTF = tf_buffer_->lookupTransform(kMapFrameID_, kRobotFrameID_, current_time_point_, tf2::durationFromSec(1.0));
-        transform = tf2::transformToEigen(transformTF);
-        rotation_map2base_ = transform.rotation().matrix();
-        translation_map2base_ = transform.translation();
+        Eigen::Affine3d transform_tf_affine;
+        transform_tf_affine = tf2::transformToEigen(transformTF);
+        rotation_map2base_ = transform_tf_affine.rotation().matrix();
+        translation_map2base_ = transform_tf_affine.translation();
 
         if (!first_tf_available_) first_tf_available_ = true;
         return true;

@@ -221,8 +221,9 @@ bool ElevationMapping::readParameters()
     sensor_frame = declare_parameter("sensor_frame", "/sensor");
     map_frame = declare_parameter("map_frame", "/map");
     robot_frame = track_point_frame_id_;
-    
+
     // Print all the parameters
+    RCLCPP_INFO(get_logger(), "@=> Elevation Mapping Parameters:");
     RCLCPP_INFO(get_logger(), "use_pose_update: %s", use_pose_update_ ? "true" : "false");
     RCLCPP_INFO(get_logger(), "use_visibility_clean_up: %s", use_visibility_clean_up_ ? "true" : "false");
     RCLCPP_INFO(get_logger(), "pose_cache_size: %d", pose_cache_size_);

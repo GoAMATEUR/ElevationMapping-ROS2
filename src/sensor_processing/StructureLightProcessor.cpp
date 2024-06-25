@@ -32,7 +32,9 @@ void StructureLightProcessor::computeVariance(const PointCloudType::Ptr _point_c
 
     // sensor to map jacobian
     const Eigen::RowVector3f sensor_jac = projection_vector*(rotation_map2base_.transpose()*rotation_base2sensor_.transpose()).cast<float>();
-
+    std::cout << "sensor_jac: " << sensor_jac << std::endl;
+    std::cout << "rotation_map2base_: " << rotation_map2base_ << std::endl;
+    std::cout << "rotation_base2sensor_: " << rotation_base2sensor_ << std::endl;
     // Robot rotation covariance
     const Eigen::Matrix3f rotation_variance = _robot_covariance.bottomRightCorner(3, 3).cast<float>();
 
@@ -71,7 +73,7 @@ void StructureLightProcessor::computeVariance(const PointCloudType::Ptr _point_c
         // variance for map 
         height_variance = rotation_jac*rotation_variance*rotation_jac.transpose();
         height_variance += sensor_jac*sensor_variance*sensor_jac.transpose();
-
+        // std::cout <<"sensor_jac"<< sensor_jac << "sensor_var: " << sensor_variance << ", height var" << height_variance << std::endl;
         _variance(i) = height_variance;
         assert( _variance(i) >= 0.0 && "Variance of point cloud is lower than 0");
     }
@@ -89,10 +91,25 @@ void StructureLightProcessor::readParameters(rclcpp::Node* _node)
     normal_factor_b_ = _node->declare_parameter("sensor.normal_factor_b", 0.0);
     normal_factor_c_ = _node->declare_parameter("sensor.normal_factor_c", 0.0);
     normal_factor_d_ = _node->declare_parameter("sensor.normal_factor_d", 0.0);
-    normal_factor_e_ = _node->declare_parameter("sensor.normal_factor_e", 0.0);
+    normal_factor_e_ = _node->declare_parameter("sensor.normal_factor_e", 1.0);
     lateral_factor_ = _node->declare_parameter("sensor.lateral_factor", 0.0);
     cutoff_min_depth_ = _node->declare_parameter("sensor.cutoff_min_depth", std::numeric_limits<double>::min());
     cutoff_max_depth_ = _node->declare_parameter("sensor.cutoff_max_depth", std::numeric_limits<double>::max());
+    
+    // Print parameters
+    RCLCPP_INFO(_node->get_logger(), "@=> Use sensor processor: StructureLightProcessor");
+    RCLCPP_INFO(_node->get_logger(), "use_voxel_filter: %s", param_voxel_grid_fitler_.use_filter ? "true" : "false");
+    RCLCPP_INFO(_node->get_logger(), "voxel_leaf_size: %f", param_voxel_grid_fitler_.leaf_size);
+    RCLCPP_INFO(_node->get_logger(), "pass_filter_lower_threshold: %f", param_pass_through_filter_.lower_threshold_);
+    RCLCPP_INFO(_node->get_logger(), "pass_filter_upper_threshold: %f", param_pass_through_filter_.upper_threshold_);
+    RCLCPP_INFO(_node->get_logger(), "logger_name: %s", logger_name_.c_str());
+    RCLCPP_INFO(_node->get_logger(), "normal_factor_a: %f", normal_factor_a_);
+    RCLCPP_INFO(_node->get_logger(), "normal_factor_b: %f", normal_factor_b_);
+    RCLCPP_INFO(_node->get_logger(), "normal_factor_c: %f", normal_factor_c_);
+    RCLCPP_INFO(_node->get_logger(), "normal_factor_d: %f", normal_factor_d_);
+    RCLCPP_INFO(_node->get_logger(), "normal_factor_e: %f", normal_factor_e_);
+    RCLCPP_INFO(_node->get_logger(), "lateral_factor: %f", lateral_factor_);
+    RCLCPP_INFO(_node->get_logger(), "cutoff_min_depth: %f", cutoff_min_depth_);
+    RCLCPP_INFO(_node->get_logger(), "cutoff_max_depth: %f", cutoff_max_depth_);
 }
-
 }
