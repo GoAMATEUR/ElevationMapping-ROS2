@@ -48,7 +48,7 @@ def generate_launch_description():
     #     arguments=['--ros-args', '--log-level', 'INFO'], 
     #     output = 'screen'
     # )
-
+    # print()
     elevation_mapping_composition = Node(
         package='elevation_mapping_ros2', 
         executable='elevation_mapping_ros2_composition', 
@@ -72,7 +72,17 @@ def generate_launch_description():
         parameters=[visualization_file]
     )
     
+    # # fix map to camera_link tf
+    # arg_m2c = ['0', '0', '0', '0', '0', '0', 'map', 'camera_link']  
+    # tf_m2c = Node(
+    #         package='tf2_ros',
+    #         executable='static_transform_publisher',
+    #         name='my_static_tf_publisher',
+    #         output='screen',  # For debugging purposes
+    #         arguments= arg_m2c
+    # )
+    
     return LaunchDescription([
         elevation_mapping_composition,
-        elevation_raw_map_visualization, 
+        elevation_raw_map_visualization,
     ])

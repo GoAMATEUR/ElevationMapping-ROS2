@@ -1,7 +1,8 @@
 /**:
   ros__parameters:
     input:
-      point_cloud: "/camera/camera/point_cloud"
-      pose_covariance: "/camera/camera/pose"
+      point_cloud: "/camera/camera/depth/color/points" # d435i Pointcloud
+      # pose_covariance: "/camera/camera/pose"
+      pose_covariance: "/camera/camera/pose_covariance" # Published by realsense2_camera inbuilt
     output:
       raw_map: raw_elevation_map

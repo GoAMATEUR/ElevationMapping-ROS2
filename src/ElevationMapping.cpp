@@ -221,8 +221,22 @@ bool ElevationMapping::readParameters()
     sensor_frame = declare_parameter("sensor_frame", "/sensor");
     map_frame = declare_parameter("map_frame", "/map");
     robot_frame = track_point_frame_id_;
+    
+    // Print all the parameters
+    RCLCPP_INFO(get_logger(), "use_pose_update: %s", use_pose_update_ ? "true" : "false");
+    RCLCPP_INFO(get_logger(), "use_visibility_clean_up: %s", use_visibility_clean_up_ ? "true" : "false");
+    RCLCPP_INFO(get_logger(), "pose_cache_size: %d", pose_cache_size_);
+    RCLCPP_INFO(get_logger(), "track_point_frame_id: %s", track_point_frame_id_.c_str());
+    RCLCPP_INFO(get_logger(), "time_tolerance_prediction: %f", time_tolerance_prediction_);
+    RCLCPP_INFO(get_logger(), "extract_vaild_area: %s", extract_vaild_area_ ? "true" : "false");
+    RCLCPP_INFO(get_logger(), "sensor_frame: %s", sensor_frame.c_str());
+    RCLCPP_INFO(get_logger(), "map_frame: %s", map_frame.c_str());
+    RCLCPP_INFO(get_logger(), "robot_frame: %s", robot_frame.c_str());
+
+
     map_.setFrameID(map_frame);
-    sensor_type = declare_parameter("sensor.type", "perfect");
+    sensor_type = declare_parameter("sensor.type", "realsense");
+    RCLCPP_WARN(this->get_logger(), "sensor type: %s", sensor_type.c_str());
     if (sensor_type == "perfect") {
         sensor_processor_ = std::make_shared<PerfectSensorProcessor>(sensor_frame, map_frame, robot_frame);
     }

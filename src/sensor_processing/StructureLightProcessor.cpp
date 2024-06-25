@@ -85,14 +85,14 @@ void StructureLightProcessor::readParameters(rclcpp::Node* _node)
     param_pass_through_filter_.upper_threshold_ = _node->declare_parameter("sensor.pass_filter_upper_threshold", std::numeric_limits<double>::infinity());
     logger_name_ = _node->declare_parameter("sensor.logger_name", "StructureLightProcessor");
 
-    normal_factor_a_ = _node->declare_parameter("sensor_processor/normal_factor_a", 0.0);
-    normal_factor_b_ = _node->declare_parameter("sensor_processor/normal_factor_b", 0.0);
-    normal_factor_c_ = _node->declare_parameter("sensor_processor/normal_factor_c", 0.0);
-    normal_factor_d_ = _node->declare_parameter("sensor_processor/normal_factor_d", 0.0);
-    normal_factor_e_ = _node->declare_parameter("sensor_processor/normal_factor_e", 0.0);
-    lateral_factor_ = _node->declare_parameter("sensor_processor/lateral_factor", 0.0);
-    cutoff_min_depth_ = _node->declare_parameter("sensor_processor/cutoff_min_depth", std::numeric_limits<double>::min());
-    cutoff_max_depth_ = _node->declare_parameter("sensor_processor/cutoff_max_depth", std::numeric_limits<double>::max());
+    normal_factor_a_ = _node->declare_parameter("sensor.normal_factor_a", 0.0);
+    normal_factor_b_ = _node->declare_parameter("sensor.normal_factor_b", 0.0);
+    normal_factor_c_ = _node->declare_parameter("sensor.normal_factor_c", 0.0);
+    normal_factor_d_ = _node->declare_parameter("sensor.normal_factor_d", 0.0);
+    normal_factor_e_ = _node->declare_parameter("sensor.normal_factor_e", 0.0);
+    lateral_factor_ = _node->declare_parameter("sensor.lateral_factor", 0.0);
+    cutoff_min_depth_ = _node->declare_parameter("sensor.cutoff_min_depth", std::numeric_limits<double>::min());
+    cutoff_max_depth_ = _node->declare_parameter("sensor.cutoff_max_depth", std::numeric_limits<double>::max());
 }
 
 }

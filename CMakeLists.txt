@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(elevation-mapping-ros2)
+project(elevation_mapping_ros2)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)

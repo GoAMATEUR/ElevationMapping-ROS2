@@ -8,7 +8,7 @@
 
 namespace elevation_mapping
 {
-using PointType = pcl::PointXYZRGB;
+using PointType = pcl::PointXYZRGB; // Simplified. TODO: PointXYZRGBConfidenceRatio
 using PointCloudType = pcl::PointCloud<PointType>;
 using GridMap = grid_map::GridMap;
 }
