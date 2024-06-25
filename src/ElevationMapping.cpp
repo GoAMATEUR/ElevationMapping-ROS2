@@ -228,6 +228,10 @@ bool ElevationMapping::readParameters()
     {
         sensor_processor_ = std::make_shared<StereoSensorProcessor>(sensor_frame, map_frame, robot_frame);
     }
+    else if (sensor_type == "realsense") {
+        // TODO: Implement structure sensor processor
+        sensor_processor_ = std::make_shared<PerfectSensorProcessor>(sensor_frame, map_frame, robot_frame);
+    }
     else 
     {
         RCLCPP_ERROR(get_logger(), "The sensor type %s is invailed", sensor_type.c_str());

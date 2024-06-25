@@ -3,8 +3,7 @@
     # frame IDs
     map_frame: "map"
     robot_frame: "base_link"
-    sensor_frame: "zedm_base_link"
-    # sensor_frame: "zedm_left_camera_optical_frame"
+    sensor_frame: "imu_optical_frame"
     # pose update
     use_pose_update: false
     pose_cache_size: 10
@@ -30,6 +29,7 @@
       increase_height_alpha: 0.1
 
     # sensor processing
+    # Ideal sensor for debugging
     sensor:
       logger_name: PerfectSensorProcessor
       type: "perfect"
@@ -47,6 +47,19 @@
       # depth_lower_limit: 0.1
       # coef_normal_variance: 0.0001
       # coef_lateral_variance: 0.0001
+
+    # # D435I
+    # sensor_processor:
+    #   logger_name: StructureLightProcessor
+    #   type: "realsense"
+    #   cutoff_min_depth: 0.2
+    #   cutoff_max_depth: 3.25
+    #   normal_factor_a: 0.000611
+    #   normal_factor_b:  0.003587
+    #   normal_factor_c: 0.3515
+    #   normal_factor_d: 0
+    #   normal_factor_e: 1
+    #   lateral_factor: 0.01576
 
     robot_motion_updater:
       logger_name: RobotMotionUpdater

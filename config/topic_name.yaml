@@ -1,7 +1,7 @@
 /**:
   ros__parameters:
     input:
-      point_cloud: "/zedm/zed_node/point_cloud/cloud_registered"
-      pose_covariance: "/zedm/zed_node/pose_with_covariance"
+      point_cloud: "/camera/camera/point_cloud"
+      pose_covariance: "/camera/camera/pose"
     output:
       raw_map: raw_elevation_map
