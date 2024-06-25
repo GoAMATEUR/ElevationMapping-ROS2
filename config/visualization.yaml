@@ -1,0 +1,36 @@
+grid_map_visualization:
+  ros__parameters:
+    grid_map_topic: /raw_elevation_map
+
+    grid_map_visualizations: [elevation_points, variance_points, map_region]
+    # grid_map_visualizations: [elevation_points, map_region, elevation_grid, elevation_cells]
+
+    elevation_points:
+      type: point_cloud
+      params:
+        layer: elevation
+
+    variance_points:
+      type: point_cloud
+      params:
+        layer: variance
+        
+    map_region:
+      type: map_region
+      params:
+        color: 3289650
+        line_width: 0.003
+
+    # elevation_grid:
+    #   type: occupancy_grid
+    #   params:
+    #     layer: elevation
+    #     data_min: 0.08
+    #     data_max: -0.16
+
+    # elevation_cells:
+    #   type: grid_cells
+    #   params:
+    #     layer: elevation
+    #     lower_threshold: -0.08
+    #     upper_threshold: 0.0
