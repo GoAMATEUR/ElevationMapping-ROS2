@@ -5,7 +5,8 @@ namespace elevation_mapping
 
 ElevationMap::ElevationMap()
     : raw_map_({"elevation", "variance", "horizontal_variance_x", "horizontal_variance_y", "horizontal_variance_xy", 
-        "color", "time", "dynamic_time", "lowest_scan_point", "sensor_x_at_lowest_scan", "sensor_y_at_lowest_scan", "sensor_z_at_lowest_scan"}), 
+        "color", "time", "dynamic_time", "lowest_scan_point", 
+        "sensor_x_at_lowest_scan", "sensor_y_at_lowest_scan", "sensor_z_at_lowest_scan"}), 
       fused_map_({"elevation", "upper_bound", "lower_bound", "color"})
 {
     raw_map_.setBasicLayers({"elevation", "variance"});
@@ -54,6 +55,8 @@ bool ElevationMap::add(PointCloudType::Ptr _point_cloud, Eigen::VectorXf& _varia
     {
         auto& point = _point_cloud->points[i];
         if (std::isnan(point.x) || std::isnan(point.y) || std::isnan(point.z)) continue;
+
+        // convert position to grid map index
         grid_map::Index index;
         grid_map::Position position(point.x, point.y);
         // Skip if it does not lie within the elevation map
@@ -64,6 +67,7 @@ bool ElevationMap::add(PointCloudType::Ptr _point_cloud, Eigen::VectorXf& _varia
         }
         point_within_map_num++;
 
+        // Get previous data from grid map
         auto& elevation = elevation_layer(index(0), index(1));
         auto& variance = variance_layer(index(0), index(1));
         auto& horizontal_variance_x = horizontal_variance_x_layer(index(0), index(1));
@@ -92,18 +96,20 @@ bool ElevationMap::add(PointCloudType::Ptr _point_cloud, Eigen::VectorXf& _varia
             continue;
         }
 
-        
         if (variance > 0.0) {
             const double mahalanobis_distance = std::fabs(point.z - elevation)/std::sqrt(variance);
             if (mahalanobis_distance > mahalanobis_distance_thres_)
             {
-                if (scan_time_since_initialization.seconds() - time <= scanning_duration_.seconds() && elevation > point.z)
+                if (scan_time_since_initialization.seconds() - time <= scanning_duration_.seconds() &&
+                    elevation > point.z)
                 {
                     // Ignore point if measurement is from the same point cloud (time comparison) and 
                     // if measurement is lower than the elevation in the map
+                    // Trick in paper.
                 }
                 else if (scan_time_since_initialization.seconds() - time <= scanning_duration_.seconds())
-                {
+                {   
+                    // Gradually update elevation
                     elevation = increase_height_alpha_*elevation + (1.0-increase_height_alpha_)*point.z;
                     variance = increase_height_alpha_*variance + (1.0-increase_height_alpha_)+point_variance;
                 }
@@ -153,11 +159,14 @@ bool ElevationMap::add(PointCloudType::Ptr _point_cloud, Eigen::VectorXf& _varia
     return true;
 }
 
+
 bool ElevationMap::fuseAll()
 {
     return fuse(grid_map::Index(0, 0), fused_map_.getSize());
 }
 
+
+// Fuse all cells within the specified area.
 bool ElevationMap::fuse(const grid_map::Index& _top_left_index, const grid_map::Size& _size)
 {
     if ((_size == 0).any()) return false;
@@ -268,6 +277,7 @@ bool ElevationMap::fuse(const grid_map::Index& _top_left_index, const grid_map::
         }
         if (i==0) 
         {
+            // 
             fused_map_.at("elevation", *area_iterator) = copy_raw_map.at("elevation", *area_iterator);
             fused_map_.at("lower_bound", *area_iterator) = copy_raw_map.at("elevation", *area_iterator) - 2.0*std::sqrt(copy_raw_map.at("variance", *area_iterator));
             fused_map_.at("upper_bound", *area_iterator) = copy_raw_map.at("elevation", *area_iterator) + 2.0*std::sqrt(copy_raw_map.at("variance", *area_iterator));
@@ -296,8 +306,10 @@ bool ElevationMap::fuse(const grid_map::Index& _top_left_index, const grid_map::
     // RCLCPP_INFO(rclcpp::get_logger(logger_name_), "Elevation map has been fused in %f s", duration.seconds());
 
     return true;
-} // end of fuse
+}
 
+
+// Use Ray tracing to cleanup the blocking points
 void ElevationMap::visibilityCleanup(const rclcpp::Time& _time_stamp)
 {
     const rclcpp::Time method_start_time = system_clock_->now();

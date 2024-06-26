@@ -4,6 +4,7 @@ namespace elevation_mapping {
 
 using std::placeholders::_1;
 
+
 ElevationMapping::ElevationMapping(const rclcpp::NodeOptions options) 
     // : rclcpp::Node("elevation_mapping", rclcpp::NodeOptions().use_intra_process_comms(true))
     : rclcpp::Node("elevation_mapping", options)
@@ -18,13 +19,17 @@ ElevationMapping::ElevationMapping(const rclcpp::NodeOptions options)
         "elevation_mapping/input/point_cloud", 10, std::bind(&ElevationMapping::callbackPointcloud, this, _1)
     );
 
+    // Publish type GridMap
     pub_raw_map_ = this->create_publisher<grid_map_msgs::msg::GridMap>(
         "elevation_mapping/output/raw_map", 10
-    );  
+    );
+
+    // Publish type PointCloud2: PProcessed point cloud
     pub_point_cloud_ = this->create_publisher<sensor_msgs::msg::PointCloud2>(
         "elevation_mapping/output/processed_point_cloud", 100
     );
 
+    // Update map location by pose message
     if (use_pose_update_)
     {
         RCLCPP_INFO(get_logger(), "Updation by pose message is enabled");
@@ -40,13 +45,17 @@ ElevationMapping::ElevationMapping(const rclcpp::NodeOptions options)
     clock_ = std::make_shared<rclcpp::Clock>(RCL_ROS_TIME);
 }
 
+
 ElevationMapping::~ElevationMapping() {}
 
+
+// Raw pointcloud callback
 void ElevationMapping::callbackPointcloud(const sensor_msgs::msg::PointCloud2::UniquePtr _point_cloud)
 {
     std::chrono::system_clock::time_point begin = std::chrono::system_clock::now();
     last_point_cloud_update_time_ = rclcpp::Time(_point_cloud->header.stamp, RCL_ROS_TIME);
 
+    // Acquire robot pose covariance from cache
     Eigen::Matrix<double, 6, 6> robot_pose_covariance;
     robot_pose_covariance.setZero();
     if (use_pose_update_)
@@ -67,11 +76,12 @@ void ElevationMapping::callbackPointcloud(const sensor_msgs::msg::PointCloud2::U
         robot_pose_covariance = Eigen::Map<const Eigen::MatrixXd>(pose_msg->pose.covariance.data(), 6, 6);
     }
 
-    // process point cloud
+    // process point cloud -> point_cloud_map_frame, height_variance
     PointCloudType::Ptr point_cloud_map_frame(new PointCloudType);
     Eigen::VectorXf height_variance;
     if (!sensor_processor_->process(_point_cloud, robot_pose_covariance, point_cloud_map_frame, height_variance))
     {
+        // if not properly processed, determine err type.
         if (!sensor_processor_->isFirstTfAvailable())
         {
             RCLCPP_ERROR_THROTTLE(this->get_logger(), *this->get_clock(), 10, "Waiting for tf transformation to be available. (Message is throttled. 10s)");
@@ -83,12 +93,15 @@ void ElevationMapping::callbackPointcloud(const sensor_msgs::msg::PointCloud2::U
             return;
         }
     }
-    // pcl::PCLPointCloud2 pcl_pc;
-    // sensor_msgs::msg::PointCloud2 processed_point_cloud;
-    // pcl::toPCLPointCloud2(*point_cloud_map_frame, pcl_pc);
-    // pcl_conversions::fromPCL(pcl_pc, processed_point_cloud);
-    // pub_point_cloud_->publish(processed_point_cloud);
 
+    // Publish processed point cloud
+    pcl::PCLPointCloud2 pcl_pc;
+    sensor_msgs::msg::PointCloud2 processed_point_cloud;
+    pcl::toPCLPointCloud2(*point_cloud_map_frame, pcl_pc);
+    pcl_conversions::fromPCL(pcl_pc, processed_point_cloud);
+    pub_point_cloud_->publish(processed_point_cloud);
+
+    // Update map location with latest robot position in map frame
     updateMapLocation();
 
     if (!updatePrediction(last_point_cloud_update_time_))
@@ -97,20 +110,23 @@ void ElevationMapping::callbackPointcloud(const sensor_msgs::msg::PointCloud2::U
         return ;
     }
 
-    // add point cloud to elevation map
-    if (!map_.add(point_cloud_map_frame, height_variance, last_point_cloud_update_time_, sensor_processor_->getTransformSensor2Map()))
+    // add latest point cloud to elevation map
+    if (!map_.add(point_cloud_map_frame, height_variance, last_point_cloud_update_time_,
+                    sensor_processor_->getTransformSensor2Map()))
     {
         RCLCPP_ERROR(get_logger(), "Adding point cloud to elevation map failed");
         // reset map update timer
         return ;
     }    
 
+    // //TODO: ?
     // map_.getRawMap().get("elevation").setZero();
     // map_.getRawMap().get("variance").setZero();
 
     // fuse previous map and current map
-    // if (use_visibility_clean_up_) map_.visibilityCleanup(last_point_cloud_update_time_);
-    // map_.fuseAll();
+    if (use_visibility_clean_up_) map_.visibilityCleanup(last_point_cloud_update_time_);
+    map_.fuseAll();
+
     if (extract_vaild_area_)
     {
         GridMap map_pub;
@@ -135,17 +151,18 @@ void ElevationMapping::callbackPointcloud(const sensor_msgs::msg::PointCloud2::U
     RCLCPP_INFO(get_logger(), "elevation mapping processing time: %lf", elapsed);
 }
 
+// Get TF from robot to map and update map location
 bool ElevationMapping::updateMapLocation()
 {
     RCLCPP_DEBUG(this->get_logger(), "Elevation map is checked for relocalization");
 
-    geometry_msgs::msg::TransformStamped track_point;
-    track_point.header.frame_id = track_point_frame_id_;
-    track_point.header.stamp.sec = rclcpp::Time(0).seconds();
-    track_point.header.stamp.nanosec = rclcpp::Time(0).nanoseconds();
-    track_point.transform.translation.x = 0.0;
-    track_point.transform.translation.y = 0.0;
-    track_point.transform.translation.z = 0.0;
+    // geometry_msgs::msg::TransformStamped track_point;
+    // track_point.header.frame_id = track_point_frame_id_;
+    // track_point.header.stamp.sec = rclcpp::Time(0).seconds();
+    // track_point.header.stamp.nanosec = rclcpp::Time(0).nanoseconds();
+    // track_point.transform.translation.x = 0.0;
+    // track_point.transform.translation.y = 0.0;
+    // track_point.transform.translation.z = 0.0;
 
     geometry_msgs::msg::TransformStamped transformed_track_point;
     try
@@ -161,8 +178,8 @@ bool ElevationMapping::updateMapLocation()
     }
     RCLCPP_DEBUG(get_logger(), "Move to the position x: %f, y: %f", transformed_track_point.transform.translation.x, transformed_track_point.transform.translation.y);
 
+    // move map to the new position
     grid_map::Position position(transformed_track_point.transform.translation.x, transformed_track_point.transform.translation.y);
-    // move map to the position
     map_.move(position);
     return true;
 }   

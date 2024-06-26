@@ -13,9 +13,7 @@ RobotMotionUpdater::~RobotMotionUpdater()
 {}
 
 
-/* 
-    @param _pose_transfrom: map to robot
-*/
+// 
 bool RobotMotionUpdater::update(ElevationMap& _map, const PoseTransform& _pose_transform, const PoseCovariance& _pose_covariance, const rclcpp::Time& _time_stamp)
 {
     if (pre_update_time_ == _time_stamp) return false;

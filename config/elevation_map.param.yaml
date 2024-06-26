@@ -2,13 +2,13 @@
   ros__parameters:
     # frame IDs
     map_frame: "map"
-    robot_frame: "camera_link"
+    robot_frame: "camera_link" # Use d435i cam link for now
     sensor_frame: "camera_depth_optical_frame" # depth camera frame
     # pose update
-    use_pose_update: false
-    pose_cache_size: 10
+    use_pose_update: false # update variance with robot pose covariance
+    pose_cache_size: 10 # number of poses to cache in loopup buffer
     # visibility clean up
-    use_visibility_clean_up: false
+    use_visibility_clean_up: true # cleanup blocking points wiz ray tracing
     extract_vaild_area: true
 
     # grid map
@@ -23,20 +23,20 @@
       max_normal_variance: 0.05
       min_horizontal_variance: 0.0025
       max_horizontal_variance: 0.5
-      mahalanobis_distance_thres: 2.5
+      mahalanobis_distance_thres: 2.5 # rule out outliers
       multi_height_noise: 0.00009
       scanning_duration: 0.5
       increase_height_alpha: 0.1
 
     ## sensor processing
     ##Ideal sensor for debugging
-    sensor:
-      logger_name: PerfectSensorProcessor
-      type: "perfect"
-      use_voxel_filter: true
-      voxel_leaf_size: 0.05
-      pass_filter_lower_threshold: -100.0 # -infinity
-      pass_filter_upper_threshold: 0.4
+    # sensor:
+    #   logger_name: PerfectSensorProcessor
+    #   type: "perfect"
+    #   use_voxel_filter: true
+    #   voxel_leaf_size: 0.05
+    #   pass_filter_lower_threshold: -100.0 # -infinity
+    #   pass_filter_upper_threshold: 0.4
 
     # sensor:
       # logger_name: StereoSensorProcessor
@@ -48,18 +48,18 @@
       # coef_normal_variance: 0.0001
       # coef_lateral_variance: 0.0001
 
-    # # D435I
-    # sensor:
-    #   logger_name: StructureLightProcessor
-    #   type: "realsense"
-    #   cutoff_min_depth: 0.2
-    #   cutoff_max_depth: 3.25
-    #   normal_factor_a: 0.000611
-    #   normal_factor_b:  0.003587
-    #   normal_factor_c: 0.3515
-    #   normal_factor_d: 0.0
-    #   normal_factor_e: 1.0
-    #   lateral_factor: 0.01576
+    # D435I
+    sensor:
+      logger_name: StructureLightProcessor
+      type: "realsense"
+      cutoff_min_depth: 0.2
+      cutoff_max_depth: 3.25
+      normal_factor_a: 0.000611
+      normal_factor_b:  0.003587
+      normal_factor_c: 0.3515
+      normal_factor_d: 0.0
+      normal_factor_e: 1.0
+      lateral_factor: 0.01576
 
     robot_motion_updater:
       logger_name: RobotMotionUpdater

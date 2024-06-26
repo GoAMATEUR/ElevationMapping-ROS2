@@ -16,12 +16,13 @@ SensorProcessorBase::~SensorProcessorBase() {}
 
 bool SensorProcessorBase::process(const sensor_msgs::msg::PointCloud2::UniquePtr& _point_cloud, const Eigen::Matrix<double, 6, 6>& _robot_covariance,  PointCloudType::Ptr& _processed_point_cloud_map_frame, Eigen::VectorXf& _variance)
 {
+    // Convert to pcl point cloud
     PointCloudType point_cloud;
     pcl::fromROSMsg(*_point_cloud, point_cloud);
     current_time_point_ = tf2_ros::fromMsg(_point_cloud->header.stamp);
     RCLCPP_DEBUG(rclcpp::get_logger(logger_name_), "Input point cloud size: %d", point_cloud.points.size());
 
-    /** listening transform from sensor frame to map frame*/
+    // listening transform from sensor frame to map frame
     if (!updateTransformations()) return false;
 
     // transform into sensor frame
