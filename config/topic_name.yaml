@@ -3,6 +3,6 @@
     input:
       point_cloud: "/camera/camera/depth/color/points" # d435i Pointcloud
       # pose_covariance: "/camera/camera/pose"
-      pose_covariance: "/camera/camera/pose_covariance" # Published by realsense2_camera inbuilt
+      pose_covariance: "/camera/camera/pose_covariance" # Odom / localization need
     output:
       raw_map: raw_elevation_map
